@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Billing System</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+        }
+        
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .app-container {
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+        
+        .navbar-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-custom {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .card-custom:hover {
+            transform: translateY(-5px);
+        }
+        
+        .btn-custom {
+            border-radius: 10px;
+            padding: 12px 24px;
+            font-weight: 500;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 10px;
+            padding: 12px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .house-item {
+            border-left: 4px solid #667eea;
+            transition: all 0.3s;
+        }
+        
+        .house-item:hover {
+            border-left-color: #764ba2;
+            background: #f8f9fa;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+        }
+        
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1rem;
+            }
+            
+            .stat-card {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Toast Container -->
+    <div class="toast-container"></div>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading hidden">
+        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-5 col-lg-4">
+                    <div class="login-card p-4">
+                        <div class="text-center mb-4">
+                            <i class="bi bi-droplet-fill text-primary" style="font-size: 3rem;"></i>
+                            <h2 class="mt-3">Water Billing</h2>
+                            <p class="text-muted">Admin Login</p>
+                        </div>
+                        <form id="loginForm">
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="bi bi-envelope"></i> Email
+                                </label>
+                                <input type="email" class="form-control" id="loginEmail" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="bi bi-lock"></i> Password
+                                </label>
+                                <input type="password" class="form-control" id="loginPassword" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 btn-custom">
+                                <i class="bi bi-box-arrow-in-right"></i> Login
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="appContainer" class="app-container hidden">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#" onclick="showDashboard()">
+                    <i class="bi bi-droplet-fill"></i> Water Billing
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showDashboard()">
+                                <i class="bi bi-house-door"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showAddHouse()">
+                                <i class="bi bi-plus-circle"></i> Add House
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showHousesList()">
+                                <i class="bi bi-list-ul"></i> Houses
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showBilling()">
+                                <i class="bi bi-cash-coin"></i> Billing
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showPricing()">
+                                <i class="bi bi-gear"></i> Pricing
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="logout()">
+                                <i class="bi bi-box-arrow-right"></i> Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Dashboard Page -->
+        <div id="dashboardPage" class="container py-4">
+            <h2 class="mb-4"><i class="bi bi-speedometer2"></i> Dashboard</h2>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="stat-card">
+                        <h5><i class="bi bi-houses"></i> Total Houses</h5>
+                        <h2 id="totalHouses">0</h2>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="stat-card">
+                        <h5><i class="bi bi-currency-rupee"></i> Unit Price</h5>
+                        <h2 id="dashUnitPrice">Rs. 0</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6 mb-3">
+                    <div class="card card-custom p-4 text-center" onclick="showAddHouse()">
+                        <i class="bi bi-plus-circle-fill text-primary" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">Add New House</h5>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card card-custom p-4 text-center" onclick="showBilling()">
+                        <i class="bi bi-cash-coin text-success" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">Generate Bill</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add House Page -->
+        <div id="addHousePage" class="container py-4 hidden">
+            <h2 class="mb-4"><i class="bi bi-plus-circle"></i> Add New House</h2>
+            
+            <div class="card card-custom p-4">
+                <form id="addHouseForm">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="bi bi-hash"></i> Connection Number
+                        </label>
+                        <input type="text" class="form-control" id="connectionNumber" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="bi bi-phone"></i> Phone Number
+                        </label>
+                        <input type="tel" class="form-control" id="phoneNumber" placeholder="923001234567" required>
+                        <small class="text-muted">Format: 923001234567 (without + sign)</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="bi bi-geo-alt"></i> Address
+                        </label>
+                        <textarea class="form-control" id="address" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="bi bi-person"></i> Home Owner Name
+                        </label>
+                        <input type="text" class="form-control" id="ownerName" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-custom w-100">
+                        <i class="bi bi-save"></i> Save House
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Houses List Page -->
+        <div id="housesListPage" class="container py-4 hidden">
+            <h2 class="mb-4"><i class="bi bi-list-ul"></i> Houses List</h2>
+            
+            <div class="card card-custom p-3 mb-4">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control" id="searchHouse" placeholder="Search by connection no, name, or address...">
+                </div>
+            </div>
+
+            <div id="housesList"></div>
+        </div>
+
+        <!-- Billing Page -->
+        <div id="billingPage" class="container py-4 hidden">
+            <h2 class="mb-4"><i class="bi bi-cash-coin"></i> Generate Water Bill</h2>
+            
+            <div class="card card-custom p-4 mb-4">
+                <form id="billingForm">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="bi bi-house"></i> Select House
+                        </label>
+                        <select class="form-select" id="billingHouseSelect" required>
+                            <option value="">Choose a house...</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="bi bi-droplet"></i> Water Usage (Units)
+                        </label>
+                        <input type="number" class="form-control" id="waterUsage" min="0" step="1" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-custom w-100">
+                        <i class="bi bi-calculator"></i> Calculate Bill
+                    </button>
+                </form>
+            </div>
+
+            <div id="billSummary" class="card card-custom p-4 hidden">
+                <h4 class="mb-3"><i class="bi bi-receipt"></i> Bill Summary</h4>
+                <hr>
+                <div id="billDetails"></div>
+                <hr>
+                <button class="btn btn-success btn-custom w-100" onclick="sendWhatsApp()">
+                    <i class="bi bi-whatsapp"></i> Send via WhatsApp
+                </button>
+            </div>
+        </div>
+
+        <!-- Pricing Configuration Page -->
+        <div id="pricingPage" class="container py-4 hidden">
+            <h2 class="mb-4"><i class="bi bi-gear"></i> Pricing Configuration</h2>
+            
+            <div class="card card-custom p-4">
+                <form id="pricingForm">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="bi bi-currency-rupee"></i> Unit Price (Rs.)
+                        </label>
+                        <input type="number" class="form-control" id="unitPrice" min="0" step="0.01" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="bi bi-plug"></i> Connection Fee (Rs.)
+                        </label>
+                        <input type="number" class="form-control" id="connectionFee" min="0" step="0.01" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-custom w-100">
+                        <i class="bi bi-save"></i> Save Pricing
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, deleteDoc, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCIrWtiPuv1Lyj3OikEZW9Vaw0NiSUTHw0",
+            authDomain: "waterbill-72680.firebaseapp.com",
+            projectId: "waterbill-72680",
+            storageBucket: "waterbill-72680.firebasestorage.app",
+            messagingSenderId: "16359273434",
+            appId: "1:16359273434:web:b27f54f93348a03ab386e3",
+            measurementId: "G-G08DJG53EY"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Global variables
+        let currentBillData = null;
+        let housesData = [];
+        let pricingData = { unitPrice: 0, connectionFee: 0 };
+
+        // Utility Functions
+        function showToast(message, type = 'success') {
+            const toastContainer = document.querySelector('.toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            toastContainer.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            setTimeout(() => toast.remove(), 5000);
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingSpinner').classList.toggle('hidden', !show);
+        }
+
+        // Navigation Functions
+        window.showDashboard = function() {
+            hideAllPages();
+            document.getElementById('dashboardPage').classList.remove('hidden');
+            loadDashboard();
+        };
+
+        window.showAddHouse = function() {
+            hideAllPages();
+            document.getElementById('addHousePage').classList.remove('hidden');
+            document.getElementById('addHouseForm').reset();
+        };
+
+        window.showHousesList = function() {
+            hideAllPages();
+            document.getElementById('housesListPage').classList.remove('hidden');
+            loadHousesList();
+        };
+
+        window.showBilling = function() {
+            hideAllPages();
+            document.getElementById('billingPage').classList.remove('hidden');
+            document.getElementById('billSummary').classList.add('hidden');
+            document.getElementById('billingForm').reset();
+            loadBillingHouses();
+        };
+
+        window.showPricing = function() {
+            hideAllPages();
+            document.getElementById('pricingPage').classList.remove('hidden');
+            loadPricing();
+        };
+
+        function hideAllPages() {
+            document.querySelectorAll('#appContainer > div').forEach(page => {
+                page.classList.add('hidden');
+            });
+        }
+
+        // Auth Functions
+        window.logout = async function() {
+            try {
+                await signOut(auth);
+                showToast('Logged out successfully', 'info');
+            } catch (error) {
+                showToast('Error logging out: ' + error.message, 'danger');
+            }
+        };
+
+        // Login Form
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            showLoading(true);
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                showToast('Login successful!', 'success');
+            } catch (error) {
+                showToast('Login failed: ' + error.message, 'danger');
+            }
+            showLoading(false);
+        });
+
+        // Auth State Observer
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('loginPage').classList.add('hidden');
+                document.getElementById('appContainer').classList.remove('hidden');
+                showDashboard();
+            } else {
+                document.getElementById('loginPage').classList.remove('hidden');
+                document.getElementById('appContainer').classList.add('hidden');
+            }
+        });
+
+        // Add House Form
+        document.getElementById('addHouseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const houseData = {
+                connectionNumber: document.getElementById('connectionNumber').value,
+                phoneNumber: document.getElementById('phoneNumber').value,
+                address: document.getElementById('address').value,
+                ownerName: document.getElementById('ownerName').value,
+                createdAt: new Date().toISOString()
+            };
+
+            showLoading(true);
+            try {
+                await addDoc(collection(db, 'houses'), houseData);
+                showToast('House added successfully!', 'success');
+                document.getElementById('addHouseForm').reset();
+                showHousesList();
+            } catch (error) {
+                showToast('Error adding house: ' + error.message, 'danger');
+            }
+            showLoading(false);
+        });
+
+        // Load Dashboard
+        async function loadDashboard() {
+            try {
+                const housesSnapshot = await getDocs(collection(db, 'houses'));
+                document.getElementById('totalHouses').textContent = housesSnapshot.size;
+
+                const pricingDoc = await getDoc(doc(db, 'settings', 'pricing'));
+                if (pricingDoc.exists()) {
+                    const pricing = pricingDoc.data();
+                    document.getElementById('dashUnitPrice').textContent = `Rs. ${pricing.unitPrice || 0}`;
+                } else {
+                    document.getElementById('dashUnitPrice').textContent = 'Rs. 0';
+                }
+            } catch (error) {
+                showToast('Error loading dashboard: ' + error.message, 'danger');
+            }
+        }
+
+        // Load Houses List
+        async function loadHousesList() {
+            showLoading(true);
+            try {
+                const housesSnapshot = await getDocs(query(collection(db, 'houses'), orderBy('connectionNumber')));
+                housesData = [];
+                housesSnapshot.forEach((doc) => {
+                    housesData.push({ id: doc.id, ...doc.data() });
+                });
+                displayHouses(housesData);
+            } catch (error) {
+                showToast('Error loading houses: ' + error.message, 'danger');
+            }
+            showLoading(false);
+        }
+
+        function displayHouses(houses) {
+            const container = document.getElementById('housesList');
+            if (houses.length === 0) {
+                container.innerHTML = '<div class="alert alert-info">No houses found. Add your first house!</div>';
+                return;
+            }
+
+            container.innerHTML = houses.map(house => `
+                <div class="card card-custom house-item mb-3 p-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <h5 class="mb-1">
+                                <i class="bi bi-house-door-fill text-primary"></i> ${house.ownerName}
+                            </h5>
+                            <p class="mb-1"><strong>Connection:</strong> ${house.connectionNumber}</p>
+                            <p class="mb-1"><i class="bi bi-phone"></i> ${house.phoneNumber}</p>
+                            <p class="mb-0 text-muted"><i class="bi bi-geo-alt"></i> ${house.address}</p>
+                        </div>
+                        <button class="btn btn-sm btn-danger" onclick="deleteHouse('${house.id}')">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Search Houses
+        document.getElementById('searchHouse').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filtered = housesData.filter(house => 
+                house.connectionNumber.toLowerCase().includes(searchTerm) ||
+                house.ownerName.toLowerCase().includes(searchTerm) ||
+                house.address.toLowerCase().includes(searchTerm)
+            );
+            displayHouses(filtered);
+        });
+
+        // Delete House
+        window.deleteHouse = async function(houseId) {
+            if (!confirm('Are you sure you want to delete this house?')) return;
+            
+            showLoading(true);
+            try {
+                await deleteDoc(doc(db, 'houses', houseId));
+                showToast('House deleted successfully', 'success');
+                loadHousesList();
+            } catch (error) {
+                showToast('Error deleting house: ' + error.message, 'danger');
+            }
+            showLoading(false);
+        };
+
+        // Load Billing Houses
+        async function loadBillingHouses() {
+            try {
+                const housesSnapshot = await getDocs(query(collection(db, 'houses'), orderBy('connectionNumber')));
+                const select = document.getElementById('billingHouseSelect');
+                select.innerHTML = '<option value="">Choose a house...</option>';
+                
+                housesSnapshot.forEach((doc) => {
+                    const house = doc.data();
+                    const option = document.createElement('option');
+                    option.value = doc.id;
+                    option.textContent = `${house.connectionNumber} - ${house.ownerName}`;
+                    option.dataset.house = JSON.stringify({ id: doc.id, ...house });
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                showToast('Error loading houses: ' + error.message, 'danger');
+            }
+        }
+
+        // Billing Form
+        document.getElementById('billingForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const select = document.getElementById('billingHouseSelect');
+            const selectedOption = select.options[select.selectedIndex];
+            const house = JSON.parse(selectedOption.dataset.house);
+            const usage = parseFloat(document.getElementById('waterUsage').value);
+
+            showLoading(true);
+            try {
+                const pricingDoc = await getDoc(doc(db, 'settings', 'pricing'));
+                if (!pricingDoc.exists()) {
+                    showToast('Please configure pricing first!', 'warning');
+                    showLoading(false);
+                    return;
+                }
+
+                const pricing = pricingDoc.data();
+                const usageAmount = usage * pricing.unitPrice;
+                const total = usageAmount + pricing.connectionFee;
+
+                currentBillData = {
+                    house,
+                    usage,
+                    unitPrice: pricing.unitPrice,
+                    connectionFee: pricing.connectionFee,
+                    usageAmount,
+                    total
+                };
+
+                displayBillSummary();
+                showLoading(false);
+            } catch (error) {
+                showToast('Error calculating bill: ' + error.message, 'danger');
+                showLoading(false);
+            }
+        });
+
+        function displayBillSummary() {
+            const { house, usage, unitPrice, connectionFee, usageAmount, total } = currentBillData;
+            
+            document.getElementById('billDetails').innerHTML = `
+                <div class="mb-3">
+                    <h5><i class="bi bi-person"></i> ${house.ownerName}</h5>
+                    <p class="mb-1"><strong>Connection No:</strong> ${house.connectionNumber}</p>
+                    <p class="mb-1"><strong>Phone:</strong> ${house.phoneNumber}</p>
+                    <p class="text-muted">${house.address}</p>
+                </div>
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <td><i class="bi bi-droplet"></i> Water Usage</td>
+                            <td class="text-end"><strong>${usage} units</strong></td>
+                        </tr>
+                        <tr>
+                            <td><i class="bi bi-currency-rupee"></i> Unit Price</td>
+                            <td class="text-end">Rs. ${unitPrice.toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                            <td>Usage Amount</td>
+                            <td class="text-end">Rs. ${usageAmount.toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                            <td><i class="bi bi-plug"></i> Connection Fee</td>
+                            <td class="text-end">Rs. ${connectionFee.toFixed(2)}</td>
+                        </tr>
+                        <tr class="table-primary">
+                            <td><strong><i class="bi bi-cash"></i> Total Amount</strong></td>
+                            <td class="text-end"><strong>Rs. ${total.toFixed(2)}</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+            
+            document.getElementById('billSummary').classList.remove('hidden');
+        }
+
+        // Send WhatsApp
+        window.sendWhatsApp = function() {
+            if (!currentBillData) return;
+            
+            const { house, usage, total } = currentBillData;
+            const message = `*Water Bill*
+            
+Connection No: ${house.connectionNumber}
+Name: ${house.ownerName}
+Usage: ${usage} units
+Total Amount: Rs. ${total.toFixed(2)}
+
+Thank you!`;
+            
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/${house.phoneNumber}?text=${encodedMessage}`;
+            window.open(whatsappUrl, '_blank');
+            showToast('WhatsApp opened successfully!', 'success');
+        };
+
+        // Load Pricing
+        async function loadPricing() {
+            showLoading(true);
+            try {
+                const pricingDoc = await getDoc(doc(db, 'settings', 'pricing'));
+                if (pricingDoc.exists()) {
+                    const pricing = pricingDoc.data();
+                    document.getElementById('unitPrice').value = pricing.unitPrice || 0;
+                    document.getElementById('connectionFee').value = pricing.connectionFee || 0;
+                }
+            } catch (error) {
+                showToast('Error loading pricing: ' + error.message, 'danger');
+            }
+            showLoading(false);
+        }
+
+        // Pricing Form
+        document.getElementById('pricingForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const pricing = {
+                unitPrice: parseFloat(document.getElementById('unitPrice').value),
+                connectionFee: parseFloat(document.getElementById('connectionFee').value),
+                updatedAt: new Date().toISOString()
+            };
+
+            showLoading(true);
+            try {
+                await setDoc(doc(db, 'settings', 'pricing'), pricing);
+                showToast('Pricing updated successfully!', 'success');
+                showDashboard();
+            } catch (error) {
+                showToast('Error updating pricing: ' + error.message, 'danger');
+            }
+            showLoading(false);
+        });
+    </script>
+</body>
+</html>
