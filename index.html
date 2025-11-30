@@ -9,18 +9,24 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
         :root {
-            --primary-color: #0d6efd;
-            --secondary-color: #6c757d;
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --tab-height: 70px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
         body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f8f9fa;
+            overflow-x: hidden;
         }
         
         .login-container {
@@ -28,62 +34,190 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
         
         .login-card {
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 2rem;
+            width: 90%;
+            max-width: 400px;
+        }
+        
+        .login-icon {
+            font-size: 4rem;
+            color: var(--primary-color);
         }
         
         .app-container {
-            background: #f8f9fa;
+            display: none;
+            padding-bottom: var(--tab-height);
             min-height: 100vh;
         }
         
-        .navbar-custom {
+        .app-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        
-        .card-custom {
-            border: none;
-            border-radius: 15px;
+            color: white;
+            padding: 1rem 1.5rem;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
         
-        .card-custom:hover {
-            transform: translateY(-5px);
+        .page-content {
+            display: none;
+            padding: 1rem;
+            padding-bottom: 2rem;
         }
         
-        .btn-custom {
-            border-radius: 10px;
-            padding: 12px 24px;
+        .page-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .bottom-tabs {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: var(--tab-height);
+            z-index: 1000;
+        }
+        
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            color: #6c757d;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            background: none;
+            height: 100%;
+        }
+        
+        .tab-item i {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .tab-item span {
+            font-size: 0.7rem;
             font-weight: 500;
         }
         
-        .form-control, .form-select {
-            border-radius: 10px;
-            padding: 12px;
+        .tab-item.active {
+            color: var(--primary-color);
+            background: linear-gradient(to bottom, rgba(102, 126, 234, 0.1), transparent);
+        }
+        
+        .tab-item:active {
+            transform: scale(0.95);
+        }
+        
+        .card-custom {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border: none;
+            margin-bottom: 1rem;
+            overflow: hidden;
         }
         
         .stat-card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .stat-card h5 {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-card h2 {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        .action-card {
+            text-align: center;
+            padding: 2rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            height: 100%;
+        }
+        
+        .action-card:active {
+            transform: scale(0.95);
+        }
+        
+        .action-card i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
         }
         
         .house-item {
-            border-left: 4px solid #667eea;
-            transition: all 0.3s;
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem;
         }
         
-        .house-item:hover {
-            border-left-color: #764ba2;
-            background: #f8f9fa;
+        .form-control, .form-select {
+            border-radius: 10px;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+        }
+        
+        .btn-danger {
+            border-radius: 8px;
         }
         
         .hidden {
@@ -96,22 +230,62 @@
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 9999;
+            background: rgba(255,255,255,0.9);
+            padding: 2rem;
+            border-radius: 15px;
         }
         
         .toast-container {
             position: fixed;
-            top: 20px;
+            top: 80px;
             right: 20px;
             z-index: 9999;
         }
         
-        @media (max-width: 768px) {
-            .navbar-brand {
-                font-size: 1rem;
+        .search-box {
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+            padding: 1rem;
+            margin: -1rem -1rem 1rem -1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .bill-table {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .bill-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .bill-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        @media (max-width: 576px) {
+            .app-header h4 {
+                font-size: 1.2rem;
             }
             
             .stat-card {
-                padding: 15px;
+                padding: 1rem;
+            }
+            
+            .stat-card h2 {
+                font-size: 1.5rem;
+            }
+            
+            .action-card {
+                padding: 1.5rem 1rem;
+            }
+            
+            .action-card i {
+                font-size: 2.5rem;
             }
         }
     </style>
@@ -130,127 +304,77 @@
 
     <!-- Login Page -->
     <div id="loginPage" class="login-container">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-md-5 col-lg-4">
-                    <div class="login-card p-4">
-                        <div class="text-center mb-4">
-                            <i class="bi bi-droplet-fill text-primary" style="font-size: 3rem;"></i>
-                            <h2 class="mt-3">Water Billing</h2>
-                            <p class="text-muted">Admin Login</p>
-                        </div>
-                        <form id="loginForm">
-                            <div class="mb-3">
-                                <label class="form-label">
-                                    <i class="bi bi-envelope"></i> Email
-                                </label>
-                                <input type="email" class="form-control" id="loginEmail" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">
-                                    <i class="bi bi-lock"></i> Password
-                                </label>
-                                <input type="password" class="form-control" id="loginPassword" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100 btn-custom">
-                                <i class="bi bi-box-arrow-in-right"></i> Login
-                            </button>
-                        </form>
-                    </div>
-                </div>
+        <div class="login-card">
+            <div class="text-center mb-4">
+                <i class="bi bi-droplet-fill login-icon"></i>
+                <h2 class="mt-3">Water Billing</h2>
+                <p class="text-muted">Admin Login</p>
             </div>
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label class="form-label">
+                        <i class="bi bi-envelope"></i> Email
+                    </label>
+                    <input type="email" class="form-control" id="loginEmail" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">
+                        <i class="bi bi-lock"></i> Password
+                    </label>
+                    <input type="password" class="form-control" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-box-arrow-in-right"></i> Login
+                </button>
+            </form>
         </div>
     </div>
 
     <!-- Main App Container -->
-    <div id="appContainer" class="app-container hidden">
-        <!-- Navbar -->
-        <!-- Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#" onclick="event.preventDefault(); showDashboard()">
-                    <i class="bi bi-droplet-fill"></i> Water Billing
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="event.preventDefault(); showDashboard()">
-                                <i class="bi bi-house-door"></i> Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="event.preventDefault(); showAddHouse()">
-                                <i class="bi bi-plus-circle"></i> Add House
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="event.preventDefault(); showHousesList()">
-                                <i class="bi bi-list-ul"></i> Houses
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="event.preventDefault(); showBilling()">
-                                <i class="bi bi-cash-coin"></i> Billing
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="event.preventDefault(); showPricing()">
-                                <i class="bi bi-gear"></i> Pricing
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="event.preventDefault(); logout()">
-                                <i class="bi bi-box-arrow-right"></i> Logout
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
+    <div id="appContainer" class="app-container">
+        <!-- Header -->
+        <div class="app-header">
+            <h4 id="pageTitle" class="mb-0">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </h4>
+        </div>
 
         <!-- Dashboard Page -->
-        <div id="dashboardPage" class="container py-4">
-            <h2 class="mb-4"><i class="bi bi-speedometer2"></i> Dashboard</h2>
-            
-            <div class="row">
-                <div class="col-md-6 mb-3">
+        <div id="dashboardPage" class="page-content active">
+            <div class="row g-3">
+                <div class="col-6">
                     <div class="stat-card">
                         <h5><i class="bi bi-houses"></i> Total Houses</h5>
                         <h2 id="totalHouses">0</h2>
                     </div>
                 </div>
-                <div class="col-md-6 mb-3">
+                <div class="col-6">
                     <div class="stat-card">
                         <h5><i class="bi bi-currency-rupee"></i> Unit Price</h5>
-                        <h2 id="dashUnitPrice">Rs. 0</h2>
+                        <h2 id="dashUnitPrice">₹0</h2>
                     </div>
                 </div>
             </div>
 
-            <div class="row mt-4">
-                <div class="col-md-6 mb-3">
-                    <div class="card card-custom p-4 text-center" onclick="showAddHouse()">
-                        <i class="bi bi-plus-circle-fill text-primary" style="font-size: 3rem;"></i>
-                        <h5 class="mt-3">Add New House</h5>
+            <div class="row g-3 mt-2">
+                <div class="col-6">
+                    <div class="card-custom action-card" onclick="switchTab('addHouse')">
+                        <i class="bi bi-plus-circle-fill text-primary"></i>
+                        <h6 class="mt-2">Add House</h6>
                     </div>
                 </div>
-                <div class="col-md-6 mb-3">
-                    <div class="card card-custom p-4 text-center" onclick="showBilling()">
-                        <i class="bi bi-cash-coin text-success" style="font-size: 3rem;"></i>
-                        <h5 class="mt-3">Generate Bill</h5>
+                <div class="col-6">
+                    <div class="card-custom action-card" onclick="switchTab('billing')">
+                        <i class="bi bi-cash-coin text-success"></i>
+                        <h6 class="mt-2">Generate Bill</h6>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Add House Page -->
-        <div id="addHousePage" class="container py-4 hidden">
-            <h2 class="mb-4"><i class="bi bi-plus-circle"></i> Add New House</h2>
-            
-            <div class="card card-custom p-4">
+        <div id="addHousePage" class="page-content">
+            <div class="card-custom p-3">
                 <form id="addHouseForm">
                     <div class="mb-3">
                         <label class="form-label">
@@ -277,7 +401,7 @@
                         </label>
                         <input type="text" class="form-control" id="ownerName" required>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-custom w-100">
+                    <button type="submit" class="btn btn-primary w-100">
                         <i class="bi bi-save"></i> Save House
                     </button>
                 </form>
@@ -285,24 +409,21 @@
         </div>
 
         <!-- Houses List Page -->
-        <div id="housesListPage" class="container py-4 hidden">
-            <h2 class="mb-4"><i class="bi bi-list-ul"></i> Houses List</h2>
-            
-            <div class="card card-custom p-3 mb-4">
+        <div id="housesPage" class="page-content">
+            <div class="search-box">
                 <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-search"></i></span>
-                    <input type="text" class="form-control" id="searchHouse" placeholder="Search by connection no, name, or address...">
+                    <span class="input-group-text bg-white border-end-0">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" class="form-control border-start-0" id="searchHouse" placeholder="Search houses...">
                 </div>
             </div>
-
             <div id="housesList"></div>
         </div>
 
         <!-- Billing Page -->
-        <div id="billingPage" class="container py-4 hidden">
-            <h2 class="mb-4"><i class="bi bi-cash-coin"></i> Generate Water Bill</h2>
-            
-            <div class="card card-custom p-4 mb-4">
+        <div id="billingPage" class="page-content">
+            <div class="card-custom p-3 mb-3">
                 <form id="billingForm">
                     <div class="mb-3">
                         <label class="form-label">
@@ -318,28 +439,25 @@
                         </label>
                         <input type="number" class="form-control" id="waterUsage" min="0" step="1" required>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-custom w-100">
+                    <button type="submit" class="btn btn-primary w-100">
                         <i class="bi bi-calculator"></i> Calculate Bill
                     </button>
                 </form>
             </div>
 
-            <div id="billSummary" class="card card-custom p-4 hidden">
-                <h4 class="mb-3"><i class="bi bi-receipt"></i> Bill Summary</h4>
-                <hr>
+            <div id="billSummary" class="card-custom p-3 hidden">
+                <h5 class="mb-3"><i class="bi bi-receipt"></i> Bill Summary</h5>
                 <div id="billDetails"></div>
-                <hr>
-                <button class="btn btn-success btn-custom w-100" onclick="sendWhatsApp()">
+                <button class="btn btn-success w-100 mt-3" onclick="sendWhatsApp()">
                     <i class="bi bi-whatsapp"></i> Send via WhatsApp
                 </button>
             </div>
         </div>
 
-        <!-- Pricing Configuration Page -->
-        <div id="pricingPage" class="container py-4 hidden">
-            <h2 class="mb-4"><i class="bi bi-gear"></i> Pricing Configuration</h2>
-            
-            <div class="card card-custom p-4">
+        <!-- Settings Page -->
+        <div id="settingsPage" class="page-content">
+            <div class="card-custom p-3 mb-3">
+                <h5 class="mb-3"><i class="bi bi-gear"></i> Pricing Configuration</h5>
                 <form id="pricingForm">
                     <div class="mb-3">
                         <label class="form-label">
@@ -353,11 +471,42 @@
                         </label>
                         <input type="number" class="form-control" id="connectionFee" min="0" step="0.01" required>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-custom w-100">
+                    <button type="submit" class="btn btn-primary w-100">
                         <i class="bi bi-save"></i> Save Pricing
                     </button>
                 </form>
             </div>
+
+            <div class="card-custom p-3">
+                <h5 class="mb-3"><i class="bi bi-person-circle"></i> Account</h5>
+                <button class="btn btn-danger w-100" onclick="logout()">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation Tabs -->
+        <div class="bottom-tabs">
+            <button class="tab-item active" onclick="switchTab('dashboard')" data-tab="dashboard">
+                <i class="bi bi-speedometer2"></i>
+                <span>Dashboard</span>
+            </button>
+            <button class="tab-item" onclick="switchTab('addHouse')" data-tab="addHouse">
+                <i class="bi bi-plus-circle"></i>
+                <span>Add House</span>
+            </button>
+            <button class="tab-item" onclick="switchTab('houses')" data-tab="houses">
+                <i class="bi bi-houses"></i>
+                <span>Houses</span>
+            </button>
+            <button class="tab-item" onclick="switchTab('billing')" data-tab="billing">
+                <i class="bi bi-cash-coin"></i>
+                <span>Billing</span>
+            </button>
+            <button class="tab-item" onclick="switchTab('settings')" data-tab="settings">
+                <i class="bi bi-gear"></i>
+                <span>Settings</span>
+            </button>
         </div>
     </div>
 
@@ -389,7 +538,64 @@
         // Global variables
         let currentBillData = null;
         let housesData = [];
-        let pricingData = { unitPrice: 0, connectionFee: 0 };
+
+        // Tab titles
+        const tabTitles = {
+            dashboard: '<i class="bi bi-speedometer2"></i> Dashboard',
+            addHouse: '<i class="bi bi-plus-circle"></i> Add House',
+            houses: '<i class="bi bi-houses"></i> Houses',
+            billing: '<i class="bi bi-cash-coin"></i> Billing',
+            settings: '<i class="bi bi-gear"></i> Settings'
+        };
+
+        // Navigation Functions
+        window.switchTab = function(tabName) {
+            // Update active tab
+            document.querySelectorAll('.tab-item').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+            // Update page title
+            document.getElementById('pageTitle').innerHTML = tabTitles[tabName];
+
+            // Hide all pages
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Show selected page
+            const pageMap = {
+                dashboard: 'dashboardPage',
+                addHouse: 'addHousePage',
+                houses: 'housesPage',
+                billing: 'billingPage',
+                settings: 'settingsPage'
+            };
+
+            document.getElementById(pageMap[tabName]).classList.add('active');
+
+            // Load page data
+            switch(tabName) {
+                case 'dashboard':
+                    loadDashboard();
+                    break;
+                case 'houses':
+                    loadHousesList();
+                    break;
+                case 'billing':
+                    document.getElementById('billSummary').classList.add('hidden');
+                    document.getElementById('billingForm').reset();
+                    loadBillingHouses();
+                    break;
+                case 'settings':
+                    loadPricing();
+                    break;
+                case 'addHouse':
+                    document.getElementById('addHouseForm').reset();
+                    break;
+            }
+        };
 
         // Utility Functions
         function showToast(message, type = 'success') {
@@ -413,47 +619,9 @@
             document.getElementById('loadingSpinner').classList.toggle('hidden', !show);
         }
 
-        // Navigation Functions
-        window.showDashboard = function() {
-            hideAllPages();
-            document.getElementById('dashboardPage').classList.remove('hidden');
-            loadDashboard();
-        };
-
-        window.showAddHouse = function() {
-            hideAllPages();
-            document.getElementById('addHousePage').classList.remove('hidden');
-            document.getElementById('addHouseForm').reset();
-        };
-
-        window.showHousesList = function() {
-            hideAllPages();
-            document.getElementById('housesListPage').classList.remove('hidden');
-            loadHousesList();
-        };
-
-        window.showBilling = function() {
-            hideAllPages();
-            document.getElementById('billingPage').classList.remove('hidden');
-            document.getElementById('billSummary').classList.add('hidden');
-            document.getElementById('billingForm').reset();
-            loadBillingHouses();
-        };
-
-        window.showPricing = function() {
-            hideAllPages();
-            document.getElementById('pricingPage').classList.remove('hidden');
-            loadPricing();
-        };
-
-        function hideAllPages() {
-            document.querySelectorAll('#appContainer > div').forEach(page => {
-                page.classList.add('hidden');
-            });
-        }
-
         // Auth Functions
         window.logout = async function() {
+            if (!confirm('Are you sure you want to logout?')) return;
             try {
                 await signOut(auth);
                 showToast('Logged out successfully', 'info');
@@ -481,12 +649,12 @@
         // Auth State Observer
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                document.getElementById('loginPage').classList.add('hidden');
-                document.getElementById('appContainer').classList.remove('hidden');
-                showDashboard();
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('appContainer').style.display = 'block';
+                switchTab('dashboard');
             } else {
-                document.getElementById('loginPage').classList.remove('hidden');
-                document.getElementById('appContainer').classList.add('hidden');
+                document.getElementById('loginPage').style.display = 'flex';
+                document.getElementById('appContainer').style.display = 'none';
             }
         });
 
@@ -507,7 +675,7 @@
                 await addDoc(collection(db, 'houses'), houseData);
                 showToast('House added successfully!', 'success');
                 document.getElementById('addHouseForm').reset();
-                showHousesList();
+                switchTab('houses');
             } catch (error) {
                 showToast('Error adding house: ' + error.message, 'danger');
             }
@@ -523,9 +691,9 @@
                 const pricingDoc = await getDoc(doc(db, 'settings', 'pricing'));
                 if (pricingDoc.exists()) {
                     const pricing = pricingDoc.data();
-                    document.getElementById('dashUnitPrice').textContent = `Rs. ${pricing.unitPrice || 0}`;
+                    document.getElementById('dashUnitPrice').textContent = `₹${pricing.unitPrice || 0}`;
                 } else {
-                    document.getElementById('dashUnitPrice').textContent = 'Rs. 0';
+                    document.getElementById('dashUnitPrice').textContent = '₹0';
                 }
             } catch (error) {
                 showToast('Error loading dashboard: ' + error.message, 'danger');
@@ -551,20 +719,20 @@
         function displayHouses(houses) {
             const container = document.getElementById('housesList');
             if (houses.length === 0) {
-                container.innerHTML = '<div class="alert alert-info">No houses found. Add your first house!</div>';
+                container.innerHTML = '<div class="alert alert-info m-3">No houses found. Add your first house!</div>';
                 return;
             }
 
             container.innerHTML = houses.map(house => `
-                <div class="card card-custom house-item mb-3 p-3">
+                <div class="card-custom house-item mb-2">
                     <div class="d-flex justify-content-between align-items-start">
                         <div class="flex-grow-1">
-                            <h5 class="mb-1">
-                                <i class="bi bi-house-door-fill text-primary"></i> ${house.ownerName}
-                            </h5>
-                            <p class="mb-1"><strong>Connection:</strong> ${house.connectionNumber}</p>
-                            <p class="mb-1"><i class="bi bi-phone"></i> ${house.phoneNumber}</p>
-                            <p class="mb-0 text-muted"><i class="bi bi-geo-alt"></i> ${house.address}</p>
+                            <h6 class="mb-1">
+                                <i class="bi bi-person-fill text-primary"></i> ${house.ownerName}
+                            </h6>
+                            <p class="mb-1 small"><strong>Con:</strong> ${house.connectionNumber}</p>
+                            <p class="mb-1 small"><i class="bi bi-phone"></i> ${house.phoneNumber}</p>
+                            <p class="mb-0 small text-muted"><i class="bi bi-geo-alt"></i> ${house.address}</p>
                         </div>
                         <button class="btn btn-sm btn-danger" onclick="deleteHouse('${house.id}')">
                             <i class="bi bi-trash"></i>
@@ -664,12 +832,12 @@
             
             document.getElementById('billDetails').innerHTML = `
                 <div class="mb-3">
-                    <h5><i class="bi bi-person"></i> ${house.ownerName}</h5>
-                    <p class="mb-1"><strong>Connection No:</strong> ${house.connectionNumber}</p>
-                    <p class="mb-1"><strong>Phone:</strong> ${house.phoneNumber}</p>
-                    <p class="text-muted">${house.address}</p>
+                    <h6><i class="bi bi-person"></i> ${house.ownerName}</h6>
+                    <p class="mb-1 small"><strong>Connection:</strong> ${house.connectionNumber}</p>
+                    <p class="mb-1 small"><strong>Phone:</strong> ${house.phoneNumber}</p>
+                    <p class="small text-muted">${house.address}</p>
                 </div>
-                <table class="table">
+                <table class="bill-table w-100">
                     <tbody>
                         <tr>
                             <td><i class="bi bi-droplet"></i> Water Usage</td>
@@ -687,9 +855,9 @@
                             <td><i class="bi bi-plug"></i> Connection Fee</td>
                             <td class="text-end">Rs. ${connectionFee.toFixed(2)}</td>
                         </tr>
-                        <tr class="table-primary">
-                            <td><strong><i class="bi bi-cash"></i> Total Amount</strong></td>
-                            <td class="text-end"><strong>Rs. ${total.toFixed(2)}</strong></td>
+                        <tr style="background: #f8f9fa; font-weight: bold;">
+                            <td><i class="bi bi-cash"></i> Total Amount</td>
+                            <td class="text-end" style="color: var(--primary-color);">Rs. ${total.toFixed(2)}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -748,7 +916,7 @@ Thank you!`;
             try {
                 await setDoc(doc(db, 'settings', 'pricing'), pricing);
                 showToast('Pricing updated successfully!', 'success');
-                showDashboard();
+                switchTab('dashboard');
             } catch (error) {
                 showToast('Error updating pricing: ' + error.message, 'danger');
             }
