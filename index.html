@@ -445,7 +445,19 @@
             loadPricing();
         };
 
+function hideAllPages() {
+    const pages = [
+        'dashboardPage',
+        'addHousePage',
+        'housesListPage',
+        'billingPage',
+        'pricingPage'
+    ];
 
+    pages.forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+    });
+        }
 
         // Auth Functions
         window.logout = async function() {
