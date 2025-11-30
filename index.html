@@ -1095,10 +1095,16 @@ Thank you!`;
         async function loadHistory() {
             showLoading(true);
             try {
-                const billsSnapshot = await getDocs(query(collection(db, 'bills'), orderBy('billingMonth', 'desc'), orderBy('createdAt', 'desc')));
+                const billsSnapshot = await getDocs(query(collection(db, 'bills'), orderBy('createdAt', 'desc')));
                 billsData = [];
                 billsSnapshot.forEach((doc) => {
                     billsData.push({ id: doc.id, ...doc.data() });
+                });
+                // Sort by billing month and creation date in memory
+                billsData.sort((a, b) => {
+                    const monthCompare = b.billingMonth.localeCompare(a.billingMonth);
+                    if (monthCompare !== 0) return monthCompare;
+                    return new Date(b.createdAt) - new Date(a.createdAt);
                 });
                 displayBills(billsData);
             } catch (error) {
