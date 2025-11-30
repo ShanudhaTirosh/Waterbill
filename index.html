@@ -411,6 +411,19 @@
         function showLoading(show) {
             document.getElementById('loadingSpinner').classList.toggle('hidden', !show);
         }
+        function hideAllPages() {
+    const pages = [
+        'dashboardPage',
+        'addHousePage',
+        'housesListPage',
+        'billingPage',
+        'pricingPage'
+    ];
+
+    pages.forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+    });
+}
 
         // Navigation Functions
         window.showDashboard = function() {
@@ -445,18 +458,10 @@
             loadPricing();
         };
 
-function hideAllPages() {
-    const pages = [
-        'dashboardPage',
-        'addHousePage',
-        'housesListPage',
-        'billingPage',
-        'pricingPage'
-    ];
-
-    pages.forEach(id => {
-        document.getElementById(id).classList.add('hidden');
-    });
+        function hideAllPages() {
+            document.querySelectorAll('#appContainer > div').forEach(page => {
+                page.classList.add('hidden');
+            });
         }
 
         // Auth Functions
@@ -486,17 +491,16 @@ function hideAllPages() {
         });
 
         // Auth State Observer
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                document.getElementById('loginPage').classList.add('hidden');
-                document.getElementById('appContainer').classList.remove('hidden');
-                showDashboard();
-            } else {
-                document.getElementById('loginPage').classList.remove('hidden');
-                document.getElementById('appContainer').classList.add('hidden');
-            }
-        });
 
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('appContainer').classList.remove('hidden');
+    } else {
+        document.getElementById('loginPage').classList.remove('hidden');
+        document.getElementById('appContainer').classList.add('hidden');
+    }
+});
         // Add House Form
         document.getElementById('addHouseForm').addEventListener('submit', async (e) => {
             e.preventDefault();
