@@ -165,43 +165,44 @@
     <!-- Main App Container -->
     <div id="appContainer" class="app-container hidden">
         <!-- Navbar -->
+        <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#" onclick="showDashboard()">
+                <a class="navbar-brand" href="#" onclick="event.preventDefault(); showDashboard()">
                     <i class="bi bi-droplet-fill"></i> Water Billing
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showDashboard()">
+                            <a class="nav-link" href="#" onclick="event.preventDefault(); showDashboard()">
                                 <i class="bi bi-house-door"></i> Dashboard
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showAddHouse()">
+                            <a class="nav-link" href="#" onclick="event.preventDefault(); showAddHouse()">
                                 <i class="bi bi-plus-circle"></i> Add House
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showHousesList()">
+                            <a class="nav-link" href="#" onclick="event.preventDefault(); showHousesList()">
                                 <i class="bi bi-list-ul"></i> Houses
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showBilling()">
+                            <a class="nav-link" href="#" onclick="event.preventDefault(); showBilling()">
                                 <i class="bi bi-cash-coin"></i> Billing
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showPricing()">
+                            <a class="nav-link" href="#" onclick="event.preventDefault(); showPricing()">
                                 <i class="bi bi-gear"></i> Pricing
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="logout()">
+                            <a class="nav-link" href="#" onclick="event.preventDefault(); logout()">
                                 <i class="bi bi-box-arrow-right"></i> Logout
                             </a>
                         </li>
@@ -411,19 +412,6 @@
         function showLoading(show) {
             document.getElementById('loadingSpinner').classList.toggle('hidden', !show);
         }
-        function hideAllPages() {
-    const pages = [
-        'dashboardPage',
-        'addHousePage',
-        'housesListPage',
-        'billingPage',
-        'pricingPage'
-    ];
-
-    pages.forEach(id => {
-        document.getElementById(id).classList.add('hidden');
-    });
-}
 
         // Navigation Functions
         window.showDashboard = function() {
@@ -491,16 +479,17 @@
         });
 
         // Auth State Observer
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('loginPage').classList.add('hidden');
+                document.getElementById('appContainer').classList.remove('hidden');
+                showDashboard();
+            } else {
+                document.getElementById('loginPage').classList.remove('hidden');
+                document.getElementById('appContainer').classList.add('hidden');
+            }
+        });
 
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        document.getElementById('loginPage').classList.add('hidden');
-        document.getElementById('appContainer').classList.remove('hidden');
-    } else {
-        document.getElementById('loginPage').classList.remove('hidden');
-        document.getElementById('appContainer').classList.add('hidden');
-    }
-});
         // Add House Form
         document.getElementById('addHouseForm').addEventListener('submit', async (e) => {
             e.preventDefault();
