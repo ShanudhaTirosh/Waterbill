@@ -3,18 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#667eea">
+    <meta name="description" content="Water Billing Management System">
+    <link rel="manifest" href="manifest.json">
     <title>Water Billing System</title>
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
     <style>
         :root {
             --primary-color: #667eea;
             --secondary-color: #764ba2;
             --tab-height: 70px;
+            --bg-color: #f8f9fa;
+            --card-bg: white;
+            --text-color: #212529;
+            --border-color: #e9ecef;
+        }
+        
+        :root.dark {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --border-color: #333;
         }
         
         * {
@@ -25,8 +41,10 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #f8f9fa;
+            background: var(--bg-color);
+            color: var(--text-color);
             overflow-x: hidden;
+            transition: background 0.3s, color 0.3s;
         }
         
         .login-container {
@@ -38,7 +56,7 @@
         }
         
         .login-card {
-            background: white;
+            background: var(--card-bg);
             border-radius: 20px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
             padding: 2rem;
@@ -75,12 +93,12 @@
         
         .page-content.active {
             display: block;
-            animation: fadeIn 0.3s;
+            animation: slideIn 0.3s ease-out;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
         }
         
         .bottom-tabs {
@@ -88,7 +106,7 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: white;
+            background: var(--card-bg);
             box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
             display: flex;
             justify-content: space-around;
@@ -134,10 +152,10 @@
         }
         
         .card-custom {
-            background: white;
+            background: var(--card-bg);
             border-radius: 15px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            border: none;
+            border: 1px solid var(--border-color);
             margin-bottom: 1rem;
             overflow: hidden;
         }
@@ -161,6 +179,14 @@
             font-size: 2rem;
             font-weight: bold;
             margin: 0;
+        }
+        
+        .stat-card.success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+        
+        .stat-card.warning {
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
         }
         
         .action-card {
@@ -193,13 +219,15 @@
         }
         
         .bill-item:hover {
-            background: #f8f9fa;
+            background: var(--bg-color);
         }
         
         .form-control, .form-select {
             border-radius: 10px;
             padding: 0.75rem;
-            border: 2px solid #e9ecef;
+            border: 2px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-color);
         }
         
         .form-control:focus, .form-select:focus {
@@ -238,10 +266,6 @@
             color: white;
         }
         
-        .btn-danger {
-            border-radius: 8px;
-        }
-        
         .hidden {
             display: none !important;
         }
@@ -252,7 +276,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 9999;
-            background: rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.95);
             padding: 2rem;
             border-radius: 15px;
         }
@@ -267,7 +291,7 @@
         .search-box {
             position: sticky;
             top: 0;
-            background: white;
+            background: var(--card-bg);
             z-index: 10;
             padding: 1rem;
             margin: -1rem -1rem 1rem -1rem;
@@ -275,26 +299,11 @@
         }
         
         .filter-box {
-            background: white;
+            background: var(--card-bg);
             border-radius: 10px;
             padding: 1rem;
             margin-bottom: 1rem;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        
-        .bill-table {
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        
-        .bill-table td {
-            padding: 0.75rem;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        
-        .bill-table tr:last-child td {
-            border-bottom: none;
         }
         
         .badge-month {
@@ -307,59 +316,54 @@
             margin-bottom: 0.5rem;
         }
         
-        .badge-paid {
+        .offline-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #dc3545;
+            color: white;
+            padding: 0.75rem;
+            text-align: center;
+            z-index: 10000;
+            display: none;
+        }
+        
+        .offline-banner.show {
+            display: block;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 250px;
+            margin-bottom: 1rem;
+        }
+        
+        .revenue-summary {
             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: white;
-            padding: 0.4rem 0.8rem;
-            border-radius: 15px;
-            font-size: 0.75rem;
-            display: inline-block;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
         }
         
-        .badge-unpaid {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            color: white;
-            padding: 0.4rem 0.8rem;
-            border-radius: 15px;
-            font-size: 0.75rem;
-            display: inline-block;
-        }
-        
-        .payment-status {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
+        .dark .loading {
+            background: rgba(30, 30, 30, 0.95);
         }
         
         @media (max-width: 576px) {
-            .app-header h4 {
-                font-size: 1.2rem;
-            }
-            
-            .stat-card {
-                padding: 1rem;
-            }
-            
             .stat-card h2 {
                 font-size: 1.5rem;
-            }
-            
-            .action-card {
-                padding: 1.5rem 1rem;
-            }
-            
-            .action-card i {
-                font-size: 2.5rem;
-            }
-            
-            .tab-item span {
-                font-size: 0.6rem;
             }
         }
     </style>
 </head>
 <body>
+
+    <!-- Offline Banner -->
+    <div id="offlineBanner" class="offline-banner">
+        <i class="bi bi-wifi-off"></i> No Internet Connection - Some features may not work
+    </div>
 
     <!-- Toast Container -->
     <div class="toast-container"></div>
@@ -423,6 +427,25 @@
                         <h2 id="totalBills">0</h2>
                     </div>
                 </div>
+                <div class="col-6">
+                    <div class="stat-card warning">
+                        <h5><i class="bi bi-exclamation-triangle"></i> Unpaid</h5>
+                        <h2 id="unpaidBills">0</h2>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="stat-card success">
+                        <h5><i class="bi bi-cash-stack"></i> This Month</h5>
+                        <h2 id="monthRevenue">Rs. 0</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-custom p-3 mt-3">
+                <h6 class="mb-3"><i class="bi bi-bar-chart"></i> Monthly Revenue</h6>
+                <div class="chart-container">
+                    <canvas id="revenueChart"></canvas>
+                </div>
             </div>
 
             <div class="row g-3 mt-2">
@@ -449,26 +472,29 @@
                         <label class="form-label">
                             <i class="bi bi-hash"></i> Connection Number
                         </label>
-                        <input type="text" class="form-control" id="connectionNumber" required>
+                        <input type="text" class="form-control" id="connectionNumber" required pattern="[A-Za-z0-9]+" title="Only letters and numbers allowed">
+                        <small class="text-muted">Must be unique</small>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">
                             <i class="bi bi-phone"></i> Phone Number
                         </label>
-                        <input type="tel" class="form-control" id="phoneNumber" placeholder="923001234567" required>
+                        <input type="tel" class="form-control" id="phoneNumber" placeholder="923001234567" required pattern="[0-9]{10,12}" title="10-12 digits only">
                         <small class="text-muted">Format: 923001234567 (without + sign)</small>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">
                             <i class="bi bi-geo-alt"></i> Address
                         </label>
-                        <textarea class="form-control" id="address" rows="3" required></textarea>
+                        <textarea class="form-control" id="address" rows="3" required minlength="10"></textarea>
+                        <small class="text-muted">Minimum 10 characters</small>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">
                             <i class="bi bi-person"></i> Home Owner Name
                         </label>
-                        <input type="text" class="form-control" id="ownerName" required>
+                        <input type="text" class="form-control" id="ownerName" required pattern="[A-Za-z\s]+" title="Only letters and spaces allowed" minlength="3">
+                        <small class="text-muted">Minimum 3 characters</small>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="bi bi-save"></i> Save House
@@ -513,6 +539,7 @@
                             <i class="bi bi-droplet"></i> Water Usage (Units)
                         </label>
                         <input type="number" class="form-control" id="waterUsage" min="0" step="1" required>
+                        <small class="text-muted">Cannot be negative</small>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="bi bi-calculator"></i> Calculate Bill
@@ -530,6 +557,9 @@
                     <button class="btn btn-success" onclick="sendWhatsApp()">
                         <i class="bi bi-whatsapp"></i> Send via WhatsApp
                     </button>
+                    <button class="btn btn-secondary" onclick="printBill()">
+                        <i class="bi bi-printer"></i> Print Bill
+                    </button>
                 </div>
             </div>
         </div>
@@ -537,6 +567,16 @@
         <!-- History Page -->
         <div id="historyPage" class="page-content">
             <div class="filter-box">
+                <div class="row g-2 mb-2">
+                    <div class="col-12">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" class="form-control" id="filterSearch" placeholder="Search by owner name...">
+                        </div>
+                    </div>
+                </div>
                 <div class="row g-2">
                     <div class="col-4">
                         <label class="form-label small">
@@ -577,10 +617,29 @@
                         </select>
                     </div>
                 </div>
-                <button class="btn btn-sm btn-primary w-100 mt-2" onclick="applyFilters()">
-                    <i class="bi bi-funnel"></i> Apply Filters
-                </button>
+                <div class="d-flex gap-2 mt-2">
+                    <button class="btn btn-sm btn-primary flex-fill" onclick="applyFilters()">
+                        <i class="bi bi-funnel"></i> Apply
+                    </button>
+                    <button class="btn btn-sm btn-secondary" onclick="clearFilters()">
+                        <i class="bi bi-x-circle"></i> Clear
+                    </button>
+                    <button class="btn btn-sm btn-info" onclick="filterLast6Months()">
+                        <i class="bi bi-calendar-range"></i> Last 6M
+                    </button>
+                </div>
             </div>
+
+            <div id="revenueSummary" class="revenue-summary hidden">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <small>Total Revenue (Filtered)</small>
+                        <h4 class="mb-0" id="filteredRevenue">Rs. 0</h4>
+                    </div>
+                    <i class="bi bi-cash-stack" style="font-size: 2rem;"></i>
+                </div>
+            </div>
+
             <div id="billsList"></div>
         </div>
 
@@ -605,6 +664,34 @@
                         <i class="bi bi-save"></i> Save Pricing
                     </button>
                 </form>
+            </div>
+
+            <div class="card-custom p-3 mb-3">
+                <h5 class="mb-3"><i class="bi bi-moon-stars"></i> Appearance</h5>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="darkModeToggle">
+                    <label class="form-check-label" for="darkModeToggle">
+                        Dark Mode
+                    </label>
+                </div>
+            </div>
+
+            <div class="card-custom p-3 mb-3">
+                <h5 class="mb-3"><i class="bi bi-download"></i> Export Data</h5>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-primary" onclick="exportHousesCSV()">
+                        <i class="bi bi-file-earmark-spreadsheet"></i> Export Houses (CSV)
+                    </button>
+                    <button class="btn btn-outline-primary" onclick="exportBillsCSV()">
+                        <i class="bi bi-file-earmark-spreadsheet"></i> Export Bills (CSV)
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-custom p-3 mb-3">
+                <h5 class="mb-3"><i class="bi bi-info-circle"></i> App Information</h5>
+                <p class="mb-1"><strong>Version:</strong> 2.0.0</p>
+                <p class="mb-0 text-muted small">Last updated: December 2024</p>
             </div>
 
             <div class="card-custom p-3">
@@ -651,7 +738,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, deleteDoc, query, orderBy, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, deleteDoc, query, orderBy, where, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         // Firebase Configuration
         const firebaseConfig = {
@@ -673,6 +760,7 @@
         let currentBillData = null;
         let housesData = [];
         let billsData = [];
+        let revenueChart = null;
 
         // Tab titles
         const tabTitles = {
@@ -687,6 +775,34 @@
         // Set default billing month to current month
         const now = new Date();
         const currentMonth = now.toISOString().slice(0, 7);
+
+        // Check online/offline status
+        window.addEventListener('online', () => {
+            document.getElementById('offlineBanner').classList.remove('show');
+            showToast('Back online!', 'success');
+        });
+
+        window.addEventListener('offline', () => {
+            document.getElementById('offlineBanner').classList.add('show');
+        });
+
+        // Dark Mode Toggle
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+            darkModeToggle.checked = true;
+        }
+
+        darkModeToggle.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            }
+        });
         
         // Navigation Functions
         window.switchTab = function(tabName) {
@@ -805,26 +921,58 @@
                 document.getElementById('loginPage').style.display = 'none';
                 document.getElementById('appContainer').style.display = 'block';
                 switchTab('dashboard');
+                setupRealtimeListeners();
             } else {
                 document.getElementById('loginPage').style.display = 'flex';
                 document.getElementById('appContainer').style.display = 'none';
             }
         });
 
-        // Add House Form
+        // Real-time listeners
+        function setupRealtimeListeners() {
+            onSnapshot(collection(db, 'houses'), () => {
+                if (document.getElementById('housesPage').classList.contains('active')) {
+                    loadHousesList();
+                }
+            });
+
+            onSnapshot(collection(db, 'bills'), () => {
+                if (document.getElementById('dashboardPage').classList.contains('active')) {
+                    loadDashboard();
+                }
+                if (document.getElementById('historyPage').classList.contains('active')) {
+                    loadHistory();
+                }
+            });
+        }
+
+        // Add House Form with validation
         document.getElementById('addHouseForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const houseData = {
-                connectionNumber: document.getElementById('connectionNumber').value,
-                phoneNumber: document.getElementById('phoneNumber').value,
-                address: document.getElementById('address').value,
-                ownerName: document.getElementById('ownerName').value,
-                createdAt: new Date().toISOString()
-            };
+            const connectionNumber = document.getElementById('connectionNumber').value.trim();
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            const address = document.getElementById('address').value.trim();
+            const ownerName = document.getElementById('ownerName').value.trim();
 
+            // Check for duplicate connection number
             showLoading(true);
             try {
+                const housesSnapshot = await getDocs(query(collection(db, 'houses'), where('connectionNumber', '==', connectionNumber)));
+                if (!housesSnapshot.empty) {
+                    showLoading(false);
+                    showToast('Connection number already exists!', 'danger');
+                    return;
+                }
+
+                const houseData = {
+                    connectionNumber,
+                    phoneNumber,
+                    address,
+                    ownerName,
+                    createdAt: new Date().toISOString()
+                };
+
                 await addDoc(collection(db, 'houses'), houseData);
                 showToast('House added successfully!', 'success');
                 document.getElementById('addHouseForm').reset();
@@ -835,17 +983,95 @@
             showLoading(false);
         });
 
-        // Load Dashboard
+        // Load Dashboard with enhanced stats
         async function loadDashboard() {
             try {
                 const housesSnapshot = await getDocs(collection(db, 'houses'));
                 document.getElementById('totalHouses').textContent = housesSnapshot.size;
 
                 const billsSnapshot = await getDocs(collection(db, 'bills'));
-                document.getElementById('totalBills').textContent = billsSnapshot.size;
+                const bills = [];
+                billsSnapshot.forEach((doc) => {
+                    bills.push(doc.data());
+                });
+                
+                document.getElementById('totalBills').textContent = bills.length;
+
+                // Count unpaid bills
+                const unpaidCount = bills.filter(b => (b.paymentStatus || 'unpaid') === 'unpaid').length;
+                document.getElementById('unpaidBills').textContent = unpaidCount;
+
+                // Calculate this month's revenue
+                const thisMonth = new Date().toISOString().slice(0, 7);
+                const monthRevenue = bills
+                    .filter(b => b.billingMonth === thisMonth && b.paymentStatus === 'paid')
+                    .reduce((sum, b) => sum + (b.total || 0), 0);
+                document.getElementById('monthRevenue').textContent = `Rs. ${monthRevenue.toFixed(0)}`;
+
+                // Create revenue chart
+                createRevenueChart(bills);
             } catch (error) {
                 showToast('Error loading dashboard: ' + error.message, 'danger');
             }
+        }
+
+        // Create Revenue Chart
+        function createRevenueChart(bills) {
+            const ctx = document.getElementById('revenueChart');
+            if (!ctx) return;
+
+            // Get last 6 months
+            const months = [];
+            const revenues = [];
+            for (let i = 5; i >= 0; i--) {
+                const date = new Date();
+                date.setMonth(date.getMonth() - i);
+                const monthKey = date.toISOString().slice(0, 7);
+                months.push(formatMonthYear(monthKey).split(' ')[0]);
+                
+                const revenue = bills
+                    .filter(b => b.billingMonth === monthKey && b.paymentStatus === 'paid')
+                    .reduce((sum, b) => sum + (b.total || 0), 0);
+                revenues.push(revenue);
+            }
+
+            if (revenueChart) {
+                revenueChart.destroy();
+            }
+
+            revenueChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Revenue (Rs.)',
+                        data: revenues,
+                        backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        borderWidth: 2,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'Rs. ' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         // Load Houses List
@@ -903,7 +1129,7 @@
 
         // Delete House
         window.deleteHouse = async function(houseId) {
-            if (!confirm('Are you sure you want to delete this house?')) return;
+            if (!confirm('Are you sure you want to delete this house? All associated bills will remain.')) return;
             
             showLoading(true);
             try {
@@ -945,6 +1171,11 @@
             const house = JSON.parse(selectedOption.dataset.house);
             const usage = parseFloat(document.getElementById('waterUsage').value);
             const billingMonth = document.getElementById('billingMonth').value;
+
+            if (usage < 0) {
+                showToast('Usage cannot be negative!', 'danger');
+                return;
+            }
 
             showLoading(true);
             try {
@@ -1003,7 +1234,7 @@
                     <p class="mb-1 small"><strong>Phone:</strong> ${house.phoneNumber}</p>
                     <p class="small text-muted">${house.address}</p>
                 </div>
-                <table class="bill-table w-100">
+                <table class="table table-sm">
                     <tbody>
                         <tr>
                             <td><i class="bi bi-droplet"></i> Water Usage</td>
@@ -1070,25 +1301,94 @@
             showLoading(false);
         };
 
-        // Send WhatsApp
+        // Send WhatsApp with improved formatting
         window.sendWhatsApp = function() {
             if (!currentBillData) return;
             
-            const { house, usage, total, billingMonth } = currentBillData;
-            const message = `*Water Bill*
+            const { house, usage, total, billingMonth, unitPrice, connectionFee, usageAmount } = currentBillData;
+            const message = `*💧 WATER BILL 💧*
+━━━━━━━━━━━━━━━━━━━━
 
-Billing Period: ${formatMonthYear(billingMonth)}
-Connection No: ${house.connectionNumber}
-Name: ${house.ownerName}
-Usage: ${usage} units
-Total Amount: Rs. ${total.toFixed(2)}
+📅 *Billing Period:* ${formatMonthYear(billingMonth)}
+🔌 *Connection No:* ${house.connectionNumber}
+👤 *Name:* ${house.ownerName}
+📍 *Address:* ${house.address}
 
-Thank you!`;
+━━━━━━━━━━━━━━━━━━━━
+💧 *Usage:* ${usage} units
+💰 *Unit Price:* Rs. ${unitPrice.toFixed(2)}
+📊 *Usage Amount:* Rs. ${usageAmount.toFixed(2)}
+🔌 *Connection Fee:* Rs. ${connectionFee.toFixed(2)}
+
+━━━━━━━━━━━━━━━━━━━━
+💵 *TOTAL AMOUNT: Rs. ${total.toFixed(2)}*
+━━━━━━━━━━━━━━━━━━━━
+
+Thank you for your payment! 🙏`;
             
             const encodedMessage = encodeURIComponent(message);
             const whatsappUrl = `https://wa.me/${house.phoneNumber}?text=${encodedMessage}`;
             window.open(whatsappUrl, '_blank');
             showToast('WhatsApp opened successfully!', 'success');
+        };
+
+        // Print Bill
+        window.printBill = function() {
+            if (!currentBillData) return;
+            
+            const { house, usage, total, billingMonth, unitPrice, connectionFee, usageAmount } = currentBillData;
+            const printWindow = window.open('', '', 'height=600,width=800');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Water Bill - ${house.connectionNumber}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; }
+                        .header { text-align: center; margin-bottom: 30px; }
+                        .bill-details { border: 2px solid #333; padding: 20px; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        td { padding: 10px; border-bottom: 1px solid #ddd; }
+                        .total { font-weight: bold; font-size: 1.2em; background: #f0f0f0; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>💧 WATER BILL</h1>
+                        <p>${formatMonthYear(billingMonth)}</p>
+                    </div>
+                    <div class="bill-details">
+                        <p><strong>Connection No:</strong> ${house.connectionNumber}</p>
+                        <p><strong>Name:</strong> ${house.ownerName}</p>
+                        <p><strong>Address:</strong> ${house.address}</p>
+                        <p><strong>Phone:</strong> ${house.phoneNumber}</p>
+                        <table>
+                            <tr>
+                                <td>Water Usage</td>
+                                <td align="right">${usage} units</td>
+                            </tr>
+                            <tr>
+                                <td>Unit Price</td>
+                                <td align="right">Rs. ${unitPrice.toFixed(2)}</td>
+                            </tr>
+                            <tr>
+                                <td>Usage Amount</td>
+                                <td align="right">Rs. ${usageAmount.toFixed(2)}</td>
+                            </tr>
+                            <tr>
+                                <td>Connection Fee</td>
+                                <td align="right">Rs. ${connectionFee.toFixed(2)}</td>
+                            </tr>
+                            <tr class="total">
+                                <td>TOTAL AMOUNT</td>
+                                <td align="right">Rs. ${total.toFixed(2)}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
         };
 
         // Load History
@@ -1100,7 +1400,6 @@ Thank you!`;
                 billsSnapshot.forEach((doc) => {
                     billsData.push({ id: doc.id, ...doc.data() });
                 });
-                // Sort by billing month and creation date in memory
                 billsData.sort((a, b) => {
                     const monthCompare = b.billingMonth.localeCompare(a.billingMonth);
                     if (monthCompare !== 0) return monthCompare;
@@ -1126,7 +1425,7 @@ Thank you!`;
                         <div class="flex-grow-1">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <div class="badge-month">${formatMonthYear(bill.billingMonth)}</div>
-                                <span class="badge-${bill.paymentStatus || 'unpaid'}">
+                                <span class="badge bg-${bill.paymentStatus === 'paid' ? 'success' : 'danger'}">
                                     <i class="bi bi-${bill.paymentStatus === 'paid' ? 'check-circle-fill' : 'x-circle-fill'}"></i>
                                     ${bill.paymentStatus === 'paid' ? 'Paid' : 'Unpaid'}
                                 </span>
@@ -1159,7 +1458,7 @@ Thank you!`;
 
             const paymentStatusText = bill.paymentStatus === 'paid' ? '✅ PAID' : '❌ UNPAID';
 
-            const message = `*Bill Details*
+            const message = `*💧 Bill Details*
 
 Billing Period: ${formatMonthYear(bill.billingMonth)}
 Payment Status: ${paymentStatusText}
@@ -1174,7 +1473,7 @@ Connection Fee: Rs. ${bill.connectionFee.toFixed(2)}
 Total Amount: Rs. ${bill.total.toFixed(2)}`;
 
             if (confirm(message + '\n\nDo you want to send this bill via WhatsApp?')) {
-                const encodedMessage = encodeURIComponent(message.replace('*Bill Details*', '*Water Bill*'));
+                const encodedMessage = encodeURIComponent(message.replace('*💧 Bill Details*', '*💧 WATER BILL 💧*'));
                 const whatsappUrl = `https://wa.me/${bill.phoneNumber}?text=${encodedMessage}`;
                 window.open(whatsappUrl, '_blank');
             }
@@ -1227,7 +1526,6 @@ Total Amount: Rs. ${bill.total.toFixed(2)}`;
             const currentYear = new Date().getFullYear();
             const years = [];
             
-            // Get years from bills
             billsData.forEach(bill => {
                 const year = bill.billingMonth.split('-')[0];
                 if (!years.includes(year)) {
@@ -1235,42 +1533,153 @@ Total Amount: Rs. ${bill.total.toFixed(2)}`;
                 }
             });
             
-            // Add current year if not in list
             if (!years.includes(currentYear.toString())) {
                 years.push(currentYear.toString());
             }
             
-            // Sort years descending
             years.sort((a, b) => b - a);
             
             yearSelect.innerHTML = '<option value="">All Years</option>' + 
                 years.map(year => `<option value="${year}">${year}</option>`).join('');
         }
 
-        // Apply Filters
+        // Apply Filters with revenue summary
         window.applyFilters = function() {
             const selectedMonth = document.getElementById('filterMonth').value;
             const selectedYear = document.getElementById('filterYear').value;
             const selectedStatus = document.getElementById('filterStatus').value;
+            const searchTerm = document.getElementById('filterSearch').value.toLowerCase();
             
             let filtered = billsData;
             
-            if (selectedMonth || selectedYear || selectedStatus) {
+            if (selectedMonth || selectedYear || selectedStatus || searchTerm) {
                 filtered = billsData.filter(bill => {
                     const [year, month] = bill.billingMonth.split('-');
                     const monthMatch = !selectedMonth || month === selectedMonth;
                     const yearMatch = !selectedYear || year === selectedYear;
                     const statusMatch = !selectedStatus || (bill.paymentStatus || 'unpaid') === selectedStatus;
-                    return monthMatch && yearMatch && statusMatch;
+                    const searchMatch = !searchTerm || bill.houseName.toLowerCase().includes(searchTerm);
+                    return monthMatch && yearMatch && statusMatch && searchMatch;
                 });
             }
             
             displayBills(filtered);
             
-            if (selectedMonth || selectedYear || selectedStatus) {
+            // Calculate and show revenue for filtered results
+            const totalRevenue = filtered
+                .filter(b => b.paymentStatus === 'paid')
+                .reduce((sum, b) => sum + (b.total || 0), 0);
+            
+            document.getElementById('filteredRevenue').textContent = `Rs. ${totalRevenue.toFixed(2)}`;
+            document.getElementById('revenueSummary').classList.remove('hidden');
+            
+            if (selectedMonth || selectedYear || selectedStatus || searchTerm) {
                 showToast(`Filtered: ${filtered.length} bill(s) found`, 'info');
             }
         };
+
+        // Clear Filters
+        window.clearFilters = function() {
+            document.getElementById('filterMonth').value = '';
+            document.getElementById('filterYear').value = '';
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterSearch').value = '';
+            document.getElementById('revenueSummary').classList.add('hidden');
+            displayBills(billsData);
+            showToast('Filters cleared', 'info');
+        };
+
+        // Filter Last 6 Months
+        window.filterLast6Months = function() {
+            const sixMonthsAgo = new Date();
+            sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+            const sixMonthsKey = sixMonthsAgo.toISOString().slice(0, 7);
+            
+            const filtered = billsData.filter(bill => bill.billingMonth >= sixMonthsKey);
+            displayBills(filtered);
+            
+            const totalRevenue = filtered
+                .filter(b => b.paymentStatus === 'paid')
+                .reduce((sum, b) => sum + (b.total || 0), 0);
+            
+            document.getElementById('filteredRevenue').textContent = `Rs. ${totalRevenue.toFixed(2)}`;
+            document.getElementById('revenueSummary').classList.remove('hidden');
+            
+            showToast(`Showing last 6 months: ${filtered.length} bill(s)`, 'info');
+        };
+
+        // Export Houses to CSV
+        window.exportHousesCSV = async function() {
+            showLoading(true);
+            try {
+                const housesSnapshot = await getDocs(collection(db, 'houses'));
+                const houses = [];
+                housesSnapshot.forEach((doc) => {
+                    houses.push(doc.data());
+                });
+
+                if (houses.length === 0) {
+                    showToast('No houses to export', 'warning');
+                    showLoading(false);
+                    return;
+                }
+
+                let csv = 'Connection Number,Owner Name,Phone Number,Address,Created At\n';
+                houses.forEach(house => {
+                    csv += `"${house.connectionNumber}","${house.ownerName}","${house.phoneNumber}","${house.address}","${house.createdAt}"\n`;
+                });
+
+                downloadCSV(csv, 'houses_export.csv');
+                showToast('Houses exported successfully!', 'success');
+            } catch (error) {
+                showToast('Error exporting houses: ' + error.message, 'danger');
+            }
+            showLoading(false);
+        };
+
+        // Export Bills to CSV
+        window.exportBillsCSV = async function() {
+            showLoading(true);
+            try {
+                const billsSnapshot = await getDocs(collection(db, 'bills'));
+                const bills = [];
+                billsSnapshot.forEach((doc) => {
+                    bills.push(doc.data());
+                });
+
+                if (bills.length === 0) {
+                    showToast('No bills to export', 'warning');
+                    showLoading(false);
+                    return;
+                }
+
+                let csv = 'Billing Month,Connection Number,Owner Name,Usage,Unit Price,Connection Fee,Total,Payment Status,Created At\n';
+                bills.forEach(bill => {
+                    csv += `"${bill.billingMonth}","${bill.connectionNumber}","${bill.houseName}",${bill.usage},${bill.unitPrice},${bill.connectionFee},${bill.total},"${bill.paymentStatus || 'unpaid'}","${bill.createdAt}"\n`;
+                });
+
+                downloadCSV(csv, 'bills_export.csv');
+                showToast('Bills exported successfully!', 'success');
+            } catch (error) {
+                showToast('Error exporting bills: ' + error.message, 'danger');
+            }
+            showLoading(false);
+        };
+
+        // Download CSV Helper
+        function downloadCSV(csvContent, filename) {
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', filename);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
 
         // Load Pricing
         async function loadPricing() {
@@ -1308,6 +1717,19 @@ Total Amount: Rs. ${bill.total.toFixed(2)}`;
             }
             showLoading(false);
         });
+
+        // Service Worker Registration for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker registered successfully:', registration);
+                    })
+                    .catch(error => {
+                        console.log('Service Worker registration failed:', error);
+                    });
+            });
+        }
     </script>
 </body>
 </html>
