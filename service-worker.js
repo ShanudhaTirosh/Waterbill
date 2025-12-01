@@ -1,7 +1,7 @@
 const CACHE_NAME = 'water-billing-v1';
 const urlsToCache = [
-  '/',
-  '/index.html'
+  '/waterbill/',
+  '/waterbill/index.html'
 ];
 
 self.addEventListener('install', event => {
